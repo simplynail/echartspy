@@ -63,9 +63,8 @@ _str_html_doc_template = '''
   {js_src}  
 </head>
 <body>
-  {div_chart}
-  
-  {js_chart}
+    {div_chart}
+    {js_chart}
 </body>
 </html>
 '''
@@ -80,11 +79,22 @@ option_default = {
                 'type': 'value',
                 'nameLocation': 'center'}],
         }
+
+div_style_default = {
+    'width': '100%',
+    'height': '100%',
+    'position': 'relative',
+    'min-height': '200px',
+    'float': 'left',
+    'padding-right': '1px',
+    'padding-left': '1px'}
         
 #chart_types = ['bar','scatter','line', pie]
 
 class Chart(object):
     option = option_default
+    _div_style = div_style_default
+    _cdn = _str_js_echarts_lib_cdn
     
     def __init__(self,typ,title=None):
         super(self.__class__,self)
@@ -93,34 +103,36 @@ class Chart(object):
         self._series = []
         self._async_series = []
         self._async_url = None
-        
-        self._cdn = _str_js_echarts_lib_cdn
-        self._div_style = {'width':'600px', 'height':'400px'}
     
         if title: self.set_option({'title':{'text':title}})
-    
-    def set_cdn(self,url):
-        self._cdn = url
+
+    @classmethod
+    def set_cdn(cls,url):
+        cls._cdn = url
 
     def set_div_style(self,**kwargs):
+        if self._div_style == self.__class__._div_style:
+            self._div_style = deepcopy(self.__class__._div_style)
         self._div_style.update(kwargs)
-    
+
+    @staticmethod
+    def _update_dict_recursive(base, option_set):
+        for key, item in option_set.items():
+            if type(item) == dict:
+                base[key] = __class__._update_dict_recursive(base.get(key, {}), item)
+            else:
+                base[key] = item
+        return base
+
     def set_option(self,option):
         '''
         updates eCharts option (recursively - no loss of unspecified options)
         option: dict(dict()) dictionary with additional options (in layout as in eCharts js option)
         '''
-        def recursive(base, option_set):
-            for key, item in option_set.items():
-                if type(item) == dict:
-                    base[key] = recursive(base.get(key,{}),item)
-                else:
-                    base[key] = item
-            return base
-
+        # TODO: this doesnt account for case if option is changed first in instance and then in class
         if self.option == self.__class__.option:
             self.option = deepcopy(self.__class__.option)
-        self.option = recursive(self.option,option)
+        self.option = self._update_dict_recursive(self.option,option)
         
     def add_series(self,name,data=None,typ=None):
         if data == None:
@@ -140,7 +152,8 @@ class Chart(object):
         '''
         self._async_url = url
 
-    def _to_json(self,data,indent=4):
+    @staticmethod
+    def _to_json(data,indent=4):
         return json.dumps(data,sort_keys=True,indent=indent)
 
     def generate_tag_div_chart(self):
@@ -164,7 +177,7 @@ class Chart(object):
 
     def generate_tag_js_src(self):
         js_src = _str_js_src_boilerplate.format(cdn=self._cdn)
-        if self._async_data != {}:
+        if self._async_series != []:
             js_src = js_src + '/n' + _str_js_src_boilerplate.format(cdn=_str_js_jquery_lib_cdn)
         return js_src
 
@@ -179,6 +192,10 @@ class Chart(object):
         return js_src,js_chart,div_chart
     
     def save_html(self,filename='echart.html',show=True):
+        if self._div_style['height'][-1] == '%':
+            # if height is in %
+            self.set_div_style(height='600px')
+
         js_src, js_chart, div_chart = self.generate_tags()
         
         html_content = _str_html_doc_template.format(js_src=js_src,js_chart=js_chart,div_chart=div_chart)
@@ -191,7 +208,7 @@ class Chart(object):
 
 
 if __name__ == "__main__":
-    chart = Chart(typ='bar')
+    chart = Chart(typ='line')
     
     chart.add_series('costam',[[1,2],[3,4]])
     chart.add_series('costam2', [[5, 6], [7, 8]])
@@ -199,5 +216,5 @@ if __name__ == "__main__":
     new_options = {'test': True,
         'test2':{'test3':{'test4':True}}}
     chart.set_option(new_options)
-    chart.set_div_style(width='1000px')
+    #chart.set_div_style(width='50%',height='335px')
     chart.save_html()
