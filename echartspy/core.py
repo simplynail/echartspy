@@ -81,6 +81,9 @@ div_style_default = {
 option_default = {
         'tooltip': {
                 'show': True},
+        'legend': {
+            'show': True
+        },
         'xAxis': {
                 'type': 'value',
                 'nameLocation': 'center'},
@@ -134,13 +137,14 @@ class Chart(object):
             self.option = deepcopy(self.__class__.option)
         self.option = self._update_dict_recursive(self.option,option)
         
-    def add_series(self,name,data=None,typ=None):
+    def add_series(self,name,data=None,typ=None,**kwargs):
         if data == None:
             self._async_series.append(name)
-        self._series.append({
-                'name':name,
+        serie = {'name':name,
                 'type':typ if typ else self._type,
-                'data':data if data else []})
+                'data':data if data else []}
+        serie.update(**kwargs)
+        self._series.append(serie)
 
     def set_async_url(self,url):
         '''

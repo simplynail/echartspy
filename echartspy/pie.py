@@ -4,7 +4,12 @@ option_overrides = {
     'tooltip': {
         'trigger': 'item',
         'formatter': "{a} <br/>{b} : {c} ({d}%)"
-    }
+    },
+    'xAxis':{
+            'show':False
+    },
+    'yAxis':{
+                'show':False}
 }
 
 series_styling = {
