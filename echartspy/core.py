@@ -19,7 +19,7 @@ from copy import deepcopy
 import webbrowser
 
 
-_str_js_echarts_lib_cdn = 'http://echarts.baidu.com/build/dist/echarts-all.js'
+_str_js_echarts_lib_cdn = 'https://cdn.bootcss.com/echarts/4.0.2/echarts-en.min.js'
 _str_js_jquery_lib_cdn = 'http://code.jquery.com/jquery-3.3.1.slim.min.js'
 
 _str_js_src_boilerplate = '<script src="{cdn}"></script>'
@@ -69,17 +69,6 @@ _str_html_doc_template = '''
 </html>
 '''
 
-option_default = {
-        'tooltip': [{
-                'show': True}],
-        'xAxis': [{
-                'type': 'value',
-                'nameLocation': 'center'}],
-        'yAxis': [{
-                'type': 'value',
-                'nameLocation': 'center'}],
-        }
-
 div_style_default = {
     'width': '100%',
     'height': '100%',
@@ -88,7 +77,18 @@ div_style_default = {
     'float': 'left',
     'padding-right': '1px',
     'padding-left': '1px'}
-        
+
+option_default = {
+        'tooltip': {
+                'show': True},
+        'xAxis': {
+                'type': 'value',
+                'nameLocation': 'center'},
+        'yAxis': {
+                'type': 'value',
+                'nameLocation': 'center'},
+        }
+
 #chart_types = ['bar','scatter','line', pie]
 
 class Chart(object):
@@ -172,7 +172,7 @@ class Chart(object):
             async_query = _str_js_chart_async_data_boilerplate.format(url=self._async_url,uid=self.uid,series_pointers=async_series_str)
             js_chart = js_chart + '\n' + async_query
         # remove quotation marks from attribute names
-        js_chart = re.sub(r'(?<!: )"(\S*?)"', '\\1', js_chart)
+        #js_chart = re.sub(r'(?<!: )"(\S*?)"', '\\1', js_chart)
         return js_chart
 
     def generate_tag_js_src(self):
