@@ -1,4 +1,4 @@
-import core
+from . import core
 
 option_overrides = {
     'tooltip': {
@@ -44,6 +44,11 @@ class Pie(core.Chart):
 
 
 if __name__ == '__main__':
+    import os, sys
+    cwd=os.getcwd()
+    cwd=(os.sep).join(cwd.split(os.sep)[:-1])
+
+
     pie = Pie()
 
     data = {'chiller':42,'hdac':15}

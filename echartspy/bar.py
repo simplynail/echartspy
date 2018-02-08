@@ -1,4 +1,4 @@
-import core
+from . import core
 
 option_overrides = {
     'tooltip': {
