@@ -1,3 +1,5 @@
+import copy
+
 from . import core
 
 option_overrides = {
@@ -19,7 +21,7 @@ series_styling = {
 }
 
 class Bar(core.Chart):
-    option = core.Chart._update_dict_recursive(core.option_default,option_overrides)
+    option = core.Chart._update_dict_recursive(copy.deepcopy(core.option_default),option_overrides)
 
     def __init__(self,categories,title=None):
         super().__init__(typ='bar',title=title)

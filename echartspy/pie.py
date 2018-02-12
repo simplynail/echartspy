@@ -1,3 +1,5 @@
+import copy
+
 from . import core
 
 option_overrides = {
@@ -9,7 +11,7 @@ option_overrides = {
             'show':False
     },
     'yAxis':{
-                'show':False}
+            'show':False}
 }
 
 series_styling = {
@@ -25,7 +27,7 @@ series_styling = {
 }
 
 class Pie(core.Chart):
-    option = core.Chart._update_dict_recursive(core.option_default,option_overrides)
+    option = core.Chart._update_dict_recursive(copy.deepcopy(core.option_default),option_overrides)
 
     def __init__(self,title=None):
         super().__init__(typ='pie',title=title)
@@ -44,11 +46,6 @@ class Pie(core.Chart):
 
 
 if __name__ == '__main__':
-    import os, sys
-    cwd=os.getcwd()
-    cwd=(os.sep).join(cwd.split(os.sep)[:-1])
-
-
     pie = Pie()
 
     data = {'chiller':42,'hdac':15}
